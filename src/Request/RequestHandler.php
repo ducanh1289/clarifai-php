@@ -11,7 +11,6 @@
 
 namespace DarrynTen\Clarifai\Request;
 
-use DarrynTen\Clarifai;
 use DarrynTen\Clarifai\Exception\ApiException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -48,53 +47,23 @@ class RequestHandler
      */
     private $version = 'v2';
 
-    /**
-     * Clarifai Client ID
-     *
-     * @var string $clientId
-     */
-    private $clientId;
 
     /**
-     * The time until which token is valid
+     * Clarifai API Key
      *
-     * @var \DateTime
+     * @var string $apiKey
      */
-    private $tokenExpireTime;
-
-    /**
-     * Clarifai Client Secret
-     *
-     * @var string $clientSecret
-     */
-    private $clientSecret;
-
-    /**
-     * Clarifai Token
-     *
-     * @var string $token
-     */
-    private $token;
-
-    /**
-     * Clarifai Token type
-     *
-     * @var string $token
-     */
-    private $tokenType;
+    private $apiKey;
 
 
     /**
      * Request handler constructor
      *
-     * @param string $clientId The client ID
-     * @param string $clientSecret The client secret
+     * @param $apiKey
      */
-    public function __construct($clientId, $clientSecret)
+    public function __construct($apiKey)
     {
-        $this->clientId = $clientId;
-        $this->clientSecret = $clientSecret;
-        $this->tokenExpireTime = new \DateTime();
+        $this->$apiKey = $apiKey;
         $this->client = new Client();
     }
 
@@ -139,45 +108,6 @@ class RequestHandler
     }
 
     /**
-     * Get token for Clarifai API requests
-     *
-     * @return string
-     */
-    private function getAuthToken()
-    {
-        // Generate a new token if current is expired or empty
-        if (!$this->token || new \DateTime() > $this->tokenExpireTime) {
-            $this->requestToken();
-        }
-
-        return $this->tokenType . ' ' . $this->token;
-    }
-
-    /**
-     * Make request to Clarifai API for the new token
-     */
-    private function requestToken()
-    {
-        $tokenResponse = $this->handleRequest(
-            'POST',
-            $this->url . '/v1/token', // endpoint is available only in v1
-            [
-                'form_params' => [
-                    'grant_type' => 'client_credentials',
-                    'client_id' => $this->clientId,
-                    'client_secret' => $this->clientSecret,
-                ],
-            ]
-        );
-
-        $this->tokenExpireTime->modify(
-            sprintf('+%s seconds', $tokenResponse['expires_in'])
-        );
-        $this->token = $tokenResponse['access_token'];
-        $this->tokenType = $tokenResponse['token_type'];
-    }
-
-    /**
      * Makes a request to Clarifai
      *
      * @param string $method The API method
@@ -192,7 +122,7 @@ class RequestHandler
     {
         $options = [
             'headers' => [
-                'Authorization' => $this->getAuthToken(),
+                'Authorization' => 'Key'.$this->apiKey,
                 'User-Agent' => sprintf(
                   'Clarifai PHP (https://github.com/darrynten/clarifai-php);v%s;%s',
                   \DarrynTen\Clarifai\Clarifai::VERSION,

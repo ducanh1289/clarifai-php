@@ -4,8 +4,9 @@
   "type": "library",
   "require": {
     "php": "^7.0",
-    "guzzlehttp/guzzle": "^6.2.1",
-    "darrynten/any-cache": "^1.0"
+    "guzzlehttp/guzzle": "^6.3",
+    "darrynten/any-cache": "^1.0",
+    "phpunit/php-invoker": "^1.1"
   },
   "require-dev": {
     "phpunit/phpunit": "~5.0",
